@@ -539,7 +539,7 @@ class ComposerStaticInit74449af1101ecd6f157052626e751738
     );
 
     public static $classMap = array (
-        'App\\Admin\\Contracts\\SettingsContract' => __DIR__ . '/../..' . '/app/Admin/Contracts/SettingsContract.php',
+        'AdminTablesSeeder' => __DIR__ . '/../..' . '/database/seeds/AdminTablesSeeder.php',
         'App\\Admin\\Controllers\\AttachmentController' => __DIR__ . '/../..' . '/app/Admin/Controllers/AttachmentController.php',
         'App\\Admin\\Controllers\\AuthController' => __DIR__ . '/../..' . '/app/Admin/Controllers/AuthController.php',
         'App\\Admin\\Controllers\\ContactController' => __DIR__ . '/../..' . '/app/Admin/Controllers/ContactController.php',
@@ -551,7 +551,7 @@ class ComposerStaticInit74449af1101ecd6f157052626e751738
         'App\\Admin\\Controllers\\OpportunityController' => __DIR__ . '/../..' . '/app/Admin/Controllers/OpportunityController.php',
         'App\\Admin\\Controllers\\ReceiptController' => __DIR__ . '/../..' . '/app/Admin/Controllers/ReceiptController.php',
         'App\\Admin\\Controllers\\SettingsController' => __DIR__ . '/../..' . '/app/Admin/Controllers/SettingsController.php',
-        'App\\Admin\\Forms\\Setting' => __DIR__ . '/../..' . '/app/Admin/Forms/Setting.php',
+        'App\\Admin\\Forms\\setting' => __DIR__ . '/../..' . '/app/Admin/Forms/setting.php',
         'App\\Admin\\Metrics\\Examples\\Adver' => __DIR__ . '/../..' . '/app/Admin/Metrics/Examples/Adver.php',
         'App\\Admin\\Metrics\\Examples\\Contracts' => __DIR__ . '/../..' . '/app/Admin/Metrics/Examples/Contracts.php',
         'App\\Admin\\Metrics\\Examples\\Customers' => __DIR__ . '/../..' . '/app/Admin/Metrics/Examples/Customers.php',
@@ -563,6 +563,9 @@ class ComposerStaticInit74449af1101ecd6f157052626e751738
         'App\\Admin\\Metrics\\Examples\\Receipts' => __DIR__ . '/../..' . '/app/Admin/Metrics/Examples/Receipts.php',
         'App\\Admin\\Metrics\\Examples\\TopUser' => __DIR__ . '/../..' . '/app/Admin/Metrics/Examples/Topuser.php',
         'App\\Admin\\Metrics\\Examples\\TotalUsers' => __DIR__ . '/../..' . '/app/Admin/Metrics/Examples/TotalUsers.php',
+        'App\\Console\\Commands\\Install' => __DIR__ . '/../..' . '/app/Console/Commands/Install.php',
+        'App\\Console\\Commands\\ResetAdminAuth' => __DIR__ . '/../..' . '/app/Console/Commands/ResetAdminAuth.php',
+        'App\\Console\\Commands\\Update' => __DIR__ . '/../..' . '/app/Console/Commands/Update.php',
         'App\\Console\\Kernel' => __DIR__ . '/../..' . '/app/Console/Kernel.php',
         'App\\Exceptions\\Handler' => __DIR__ . '/../..' . '/app/Exceptions/Handler.php',
         'App\\Http\\Controllers\\Controller' => __DIR__ . '/../..' . '/app/Http/Controllers/Controller.php',

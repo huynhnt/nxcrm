@@ -6,7 +6,7 @@ $vendorDir = dirname(dirname(__FILE__));
 $baseDir = dirname($vendorDir);
 
 return array(
-    'App\\Admin\\Contracts\\SettingsContract' => $baseDir . '/app/Admin/Contracts/SettingsContract.php',
+    'AdminTablesSeeder' => $baseDir . '/database/seeds/AdminTablesSeeder.php',
     'App\\Admin\\Controllers\\AttachmentController' => $baseDir . '/app/Admin/Controllers/AttachmentController.php',
     'App\\Admin\\Controllers\\AuthController' => $baseDir . '/app/Admin/Controllers/AuthController.php',
     'App\\Admin\\Controllers\\ContactController' => $baseDir . '/app/Admin/Controllers/ContactController.php',
@@ -18,7 +18,7 @@ return array(
     'App\\Admin\\Controllers\\OpportunityController' => $baseDir . '/app/Admin/Controllers/OpportunityController.php',
     'App\\Admin\\Controllers\\ReceiptController' => $baseDir . '/app/Admin/Controllers/ReceiptController.php',
     'App\\Admin\\Controllers\\SettingsController' => $baseDir . '/app/Admin/Controllers/SettingsController.php',
-    'App\\Admin\\Forms\\Setting' => $baseDir . '/app/Admin/Forms/Setting.php',
+    'App\\Admin\\Forms\\setting' => $baseDir . '/app/Admin/Forms/setting.php',
     'App\\Admin\\Metrics\\Examples\\Adver' => $baseDir . '/app/Admin/Metrics/Examples/Adver.php',
     'App\\Admin\\Metrics\\Examples\\Contracts' => $baseDir . '/app/Admin/Metrics/Examples/Contracts.php',
     'App\\Admin\\Metrics\\Examples\\Customers' => $baseDir . '/app/Admin/Metrics/Examples/Customers.php',
@@ -30,6 +30,9 @@ return array(
     'App\\Admin\\Metrics\\Examples\\Receipts' => $baseDir . '/app/Admin/Metrics/Examples/Receipts.php',
     'App\\Admin\\Metrics\\Examples\\TopUser' => $baseDir . '/app/Admin/Metrics/Examples/Topuser.php',
     'App\\Admin\\Metrics\\Examples\\TotalUsers' => $baseDir . '/app/Admin/Metrics/Examples/TotalUsers.php',
+    'App\\Console\\Commands\\Install' => $baseDir . '/app/Console/Commands/Install.php',
+    'App\\Console\\Commands\\ResetAdminAuth' => $baseDir . '/app/Console/Commands/ResetAdminAuth.php',
+    'App\\Console\\Commands\\Update' => $baseDir . '/app/Console/Commands/Update.php',
     'App\\Console\\Kernel' => $baseDir . '/app/Console/Kernel.php',
     'App\\Exceptions\\Handler' => $baseDir . '/app/Exceptions/Handler.php',
     'App\\Http\\Controllers\\Controller' => $baseDir . '/app/Http/Controllers/Controller.php',

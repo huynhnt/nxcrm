@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="693114c5-d28b-449f-b4e5-b10bfb192720" name="默认的" comment="增加多种主题配色，增加登录页简洁模式切换">
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+    <list default="true" id="693114c5-d28b-449f-b4e5-b10bfb192720" name="默认的" comment="修复数据库迁移顺序">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/nxcom.sql" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/database/seeds/AdminTablesSeeder.php" beforeDir="false" afterPath="$PROJECT_DIR$/database/factories/AdminTablesSeeder.php" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -143,7 +142,7 @@
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/../NxOffice_Professional" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="node.js.detected.package.eslint" value="true" />
     <property name="node.js.detected.package.tslint" value="true" />
     <property name="node.js.path.for.package.eslint" value="project" />
@@ -160,6 +159,9 @@
       <recent name="D:\WWW\laravelcrm\resources\views\admin" />
       <recent name="D:\WWW\laravelcrm\resources\lang" />
       <recent name="D:\WWW\laravelcrm\app\Admin\Forms" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="D:\WWW\laravelcrm\database\factories" />
     </key>
   </component>
   <component name="RunManager">
@@ -178,7 +180,9 @@
       <updated>1609158478429</updated>
       <workItem from="1609158479708" duration="17055000" />
       <workItem from="1609215016789" duration="9000" />
-      <workItem from="1609215947537" duration="34000" />
+      <workItem from="1609215947537" duration="360000" />
+      <workItem from="1609217086503" duration="986000" />
+      <workItem from="1609243905871" duration="140000" />
     </task>
     <task id="LOCAL-00001" summary="优化后端界面，优化配置项，后台菜单独立">
       <created>1609207649201</created>
@@ -229,7 +233,21 @@
       <option name="project" value="LOCAL" />
       <updated>1609214316240</updated>
     </task>
-    <option name="localTasksCounter" value="8" />
+    <task id="LOCAL-00008" summary="排除文件">
+      <created>1609216074391</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1609216074391</updated>
+    </task>
+    <task id="LOCAL-00009" summary="修复数据库迁移顺序">
+      <created>1609217462386</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1609217462386</updated>
+    </task>
+    <option name="localTasksCounter" value="10" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -252,6 +270,8 @@
     <MESSAGE value="修复版本号" />
     <MESSAGE value="项目介绍" />
     <MESSAGE value="增加多种主题配色，增加登录页简洁模式切换" />
-    <option name="LAST_COMMIT_MESSAGE" value="增加多种主题配色，增加登录页简洁模式切换" />
+    <MESSAGE value="排除文件" />
+    <MESSAGE value="修复数据库迁移顺序" />
+    <option name="LAST_COMMIT_MESSAGE" value="修复数据库迁移顺序" />
   </component>
 </project>
