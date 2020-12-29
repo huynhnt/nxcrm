@@ -3,31 +3,30 @@
 namespace Dcat\Admin\Form\Field;
 
 use Dcat\Admin\Form\Field;
+use Illuminate\Support\Str;
 
 class Button extends Field
 {
     protected $class = 'btn-primary';
 
-    public function class(string $class)
+    public function __construct($label)
     {
-        $this->class = $class;
+        parent::__construct(Str::random(), [$label]);
 
-        return $this;
+        $this->addVariables(['buttonClass' => $this->class]);
     }
 
-    public function variables()
+    public function class(string $class)
     {
-        $this->addVariables(['buttonClass' => $this->class]);
-
-        return parent::variables();
+        return $this->addVariables(['buttonClass' => $class]);
     }
 
     public function on($event, $callback)
     {
         $this->script = <<<JS
-        $('{$this->getElementClassSelector()}').on('$event', function() {
-            $callback
-        });
+$('{$this->getElementClassSelector()}').on('$event', function() {
+    $callback
+});
 JS;
     }
 }

@@ -82,12 +82,6 @@ function extend (Dcat) {
 function listen(Dcat) {
     // 只初始化一次
     Dcat.booting(() => {
-        // ajax全局设置
-        $.ajaxSetup({
-            cache: true,
-            error: Dcat.handleAjaxError
-        });
-
         Dcat.NP.configure({parent: '.app-content'});
 
         // layer弹窗设置
@@ -99,15 +93,23 @@ function listen(Dcat) {
         new Menu(Dcat);
         // 返回顶部按钮
         new Footer(Dcat);
+        // data-action 动作绑定(包括删除、批量删除等操作)
+        new DataActions(Dcat);
     });
 
     // 每个请求都初始化
     Dcat.bootingEveryRequest(() => {
+        // ajax全局设置
+        $.ajaxSetup({
+            cache: true,
+            error: Dcat.handleAjaxError,
+            headers: {
+                'X-CSRF-TOKEN': Dcat.token
+            }
+        });
+
         // pjax初始化功能
         new Pjax(Dcat);
-        // data-action 动作绑定(包括删除、批量删除等操作)
-        new DataActions(Dcat);
-
     });
 }
 
@@ -124,8 +126,3 @@ function prepare(Dcat) {
 win.CreateDcat = function(config) {
     return prepare(new Dcat(config));
 };
-
-win.replaceNestedFormIndex = function (value) {
-    return value;
-};
-

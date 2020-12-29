@@ -3,50 +3,20 @@
 namespace Dcat\Admin\Support;
 
 use Dcat\Admin\Admin;
-use Illuminate\Contracts\Support\Renderable;
+use Dcat\Admin\Contracts\LazyRenderable as Renderable;
+use Dcat\Admin\Traits\LazyWidget;
 
 abstract class LazyRenderable implements Renderable
 {
+    use LazyWidget;
+
     protected static $js = [];
 
     protected static $css = [];
 
-    protected $parameters = [];
-
-    public function __construct(array $parameters = null)
+    public function __construct(array $payload = [])
     {
-        $this->with($parameters);
-    }
-
-    public function with($key, $value = null)
-    {
-        if (is_array($key)) {
-            $this->parameters = array_merge($this->parameters, $key);
-        } elseif ($key !== null) {
-            $this->parameters[$key] = $value;
-        }
-
-        return $this;
-    }
-
-    public function getUrl()
-    {
-        $data = array_merge($this->parameters(), [
-            'renderable' => str_replace('\\', '_', static::class),
-        ]);
-
-        return route(admin_api_route('render'), $data);
-    }
-
-    public function parameters()
-    {
-        return $this->parameters;
-    }
-
-    public static function collectAssets()
-    {
-        Admin::js(static::$js);
-        Admin::css(static::$css);
+        $this->payload($payload);
     }
 
     public static function make(...$params)
@@ -54,13 +24,14 @@ abstract class LazyRenderable implements Renderable
         return new static(...$params);
     }
 
-    public function __set($name, $value)
+    public static function requireAssets()
     {
-        $this->with($name, $value);
+        Admin::js(static::$js);
+        Admin::css(static::$css);
     }
 
     public function __get($name)
     {
-        return $this->parameters[$name] ?? null;
+        return $this->payload[$name] ?? null;
     }
 }

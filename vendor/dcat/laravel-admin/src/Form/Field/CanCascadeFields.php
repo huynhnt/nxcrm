@@ -3,6 +3,7 @@
 namespace Dcat\Admin\Form\Field;
 
 use Dcat\Admin\Admin;
+use Dcat\Admin\Exception\RuntimeException;
 use Dcat\Admin\Form;
 use Illuminate\Support\Arr;
 
@@ -78,10 +79,10 @@ trait CanCascadeFields
     {
         $this->conditions[] = compact('operator', 'value', 'closure');
 
-        $this->form->cascadeGroup($closure, [
+        ($this->parent ?: $this->form)->cascadeGroup($closure, [
             'column' => $this->column(),
             'index'  => count($this->conditions) - 1,
-            'class'  => $this->getCascadeClass($value),
+            'class'  => $this->getCascadeClass($value, $operator),
         ]);
     }
 
@@ -90,21 +91,48 @@ trait CanCascadeFields
      *
      * @return string
      */
-    protected function getCascadeClass($value)
+    protected function getCascadeClass($value, string $operator)
     {
         if (is_array($value)) {
             $value = implode('-', $value);
         }
 
-        return sprintf('cascade-%s-%s', $this->getElementClassString(), $value);
+        $map = [
+            '=' => '0',
+            '>' => '1',
+            '<' => '2',
+            '!=' => '3',
+            'in' => '4',
+            'notIn' => '5',
+            '>=' => '6',
+            '<=' => '7',
+            'has' => '8',
+        ];
+
+        return sprintf('cascade-%s-%s-%s', str_replace(' ', '-', $this->getElementClassString()), $value, $map[$operator]);
+    }
+
+    protected function addCascadeScript()
+    {
+        if (! $script = $this->getCascadeScript()) {
+            return;
+        }
+
+        Admin::script(
+            <<<JS
+Dcat.init('{$this->getElementClassSelector()}', function (\$this) {
+    {$script}
+});
+JS
+        );
     }
 
     /**
      * Add cascade scripts to contents.
      *
-     * @return void
+     * @return string
      */
-    protected function addCascadeScript()
+    protected function getCascadeScript()
     {
         if (empty($this->conditions)) {
             return;
@@ -112,25 +140,36 @@ trait CanCascadeFields
 
         $cascadeGroups = collect($this->conditions)->map(function ($condition) {
             return [
-                'class'    => $this->getCascadeClass($condition['value']),
+                'class'    => $this->getCascadeClass($condition['value'], $condition['operator']),
                 'operator' => $condition['operator'],
                 'value'    => $condition['value'],
             ];
         })->toJson();
 
-        $script = <<<JS
+        return <<<JS
 (function () {
     var compare = function (a, b, o) {
-        if ($.isArray(b)) {
-            for (var i in b) {
-                if (operator_table[o](a, b[i])) {
-                    return true;
-                }
-            }
-            return false;
+        if (! $.isArray(b)) {
+            return operator_table[o](a, b)
         }
         
-        return operator_table[o](a, b)
+        if (o === '!=') {
+            var result = true;
+            for (var i in b) {
+                if (! operator_table[o](a, b[i])) {
+                    result = false;
+                    
+                    break;
+                }
+            }
+            return result;
+        }
+        
+        for (var i in b) {
+            if (operator_table[o](a, b[i])) {
+                return true;
+            }
+        }
     };
     
     var operator_table = {
@@ -158,7 +197,7 @@ trait CanCascadeFields
     };
     var cascade_groups = {$cascadeGroups}, event = '{$this->cascadeEvent}';
 
-    $('{$this->getElementClassSelector()}').on(event, function (e) {
+    \$this.on(event, function (e) {
         {$this->getFormFrontValue()}
 
         cascade_groups.forEach(function (event) {
@@ -172,8 +211,6 @@ trait CanCascadeFields
     }).trigger(event);
 })();
 JS;
-
-        Admin::script($script);
     }
 
     /**
@@ -196,7 +233,7 @@ var checked = $('{$this->getElementClassSelector()}:checked').map(function(){
 }).get();
 JS;
             default:
-                throw new \InvalidArgumentException('Invalid form field type');
+                throw new RuntimeException('Invalid form field type');
         }
     }
 }

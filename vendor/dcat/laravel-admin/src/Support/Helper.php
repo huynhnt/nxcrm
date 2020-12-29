@@ -2,7 +2,9 @@
 
 namespace Dcat\Admin\Support;
 
+use Dcat\Admin\Admin;
 use Dcat\Admin\Grid;
+use Dcat\Laravel\Database\WhereHasInServiceProvider;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Contracts\Support\Jsonable;
@@ -10,7 +12,6 @@ use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
 use Symfony\Component\Process\Process;
@@ -32,27 +33,6 @@ class Helper
         'audio'      => 'mp3|wav|flac|3pg|aa|aac|ape|au|m4a|mpc|ogg',
         'video'      => 'mkv|rmvb|flv|mp4|avi|wmv|rm|asf|mpeg',
     ];
-
-    /**
-     * 更新扩展配置.
-     *
-     * @param array $config
-     *
-     * @return bool
-     */
-    public static function updateExtensionConfig(array $config)
-    {
-        $files = app('files');
-        $result = (bool) $files->put(config_path('admin-extensions.php'), self::exportArrayPhp($config));
-
-        if ($result && is_file(base_path('bootstrap/cache/config.php'))) {
-            Artisan::call('config:cache');
-        }
-
-        config(['admin-extensions' => $config]);
-
-        return $result;
-    }
 
     /**
      * 把给定的值转化为数组.
@@ -317,13 +297,13 @@ class Helper
         $parentId = is_numeric($parentId) ? (int) $parentId : $parentId;
 
         foreach ($nodes as $node) {
-            $pk = Arr::get($node, $parentKeyName);
+            $pk = $node[$parentKeyName];
             $pk = is_numeric($pk) ? (int) $pk : $pk;
 
             if ($pk === $parentId) {
                 $children = static::buildNestedArray(
                     $nodes,
-                    Arr::get($node, $primaryKeyName),
+                    $node[$primaryKeyName],
                     $primaryKeyName,
                     $parentKeyName,
                     $childrenKeyName
@@ -347,7 +327,7 @@ class Helper
      */
     public static function slug(string $name, string $symbol = '-')
     {
-        $text = preg_replace_callback('/([A-Z])/', function (&$text) use ($symbol) {
+        $text = preg_replace_callback('/([A-Z])/', function ($text) use ($symbol) {
             return $symbol.strtolower($text[1]);
         }, $name);
 
@@ -644,6 +624,27 @@ class Helper
     }
 
     /**
+     * 判断给定的数组是是否包含给定元素.
+     *
+     * @param mixed $value
+     * @param array $array
+     *
+     * @return bool
+     */
+    public static function inArray($value, array $array)
+    {
+        $array = array_map(function ($v) {
+            if (is_scalar($v) || $v === null) {
+                $v = (string) $v;
+            }
+
+            return $v;
+        }, $array);
+
+        return in_array((string) $value, $array, true);
+    }
+
+    /**
      * Limit the number of characters in a string.
      *
      * @param string $value
@@ -675,8 +676,11 @@ class Helper
             $class = get_class($class);
         }
 
-        if (class_exists($class)) {
-            return (new \ReflectionClass($class))->getFileName();
+        try {
+            if (class_exists($class)) {
+                return (new \ReflectionClass($class))->getFileName();
+            }
+        } catch (\Throwable $e) {
         }
 
         $class = trim($class, '\\');
@@ -743,8 +747,163 @@ class Helper
 
         foreach ($relations as $first => $v) {
             if (isset($input[$first])) {
+                foreach ($input[$first] as $key => $value) {
+                    if (is_array($value)) {
+                        $input["$first.$key"] = $value;
+                    }
+                }
+
                 $input = array_merge($input, Arr::dot([$first => $input[$first]]));
             }
         }
+    }
+
+    /**
+     * 设置查询条件.
+     *
+     * @param mixed $model
+     * @param string $column
+     * @param string $query
+     * @param mixed array $params
+     *
+     * @return void
+     */
+    public static function withQueryCondition($model, ?string $column, string $query, array $params)
+    {
+        if (! Str::contains($column, '.')) {
+            $model->$query($column, ...$params);
+
+            return;
+        }
+
+        $method = $query === 'orWhere' ? 'orWhere' : 'where';
+        $subQuery = $query === 'orWhere' ? 'where' : $query;
+
+        $model->$method(function ($q) use ($column, $subQuery, $params) {
+            static::withRelationQuery($q, $column, $subQuery, $params);
+        });
+    }
+
+    /**
+     * 设置关联关系查询条件.
+     *
+     * @param mixed $model
+     * @param string $column
+     * @param string $query
+     * @param mixed ...$params
+     *
+     * @return void
+     */
+    public static function withRelationQuery($model, ?string $column, string $query, array $params)
+    {
+        $column = explode('.', $column);
+
+        array_unshift($params, array_pop($column));
+
+        // 增加对whereHasIn的支持
+        $method = class_exists(WhereHasInServiceProvider::class) ? 'whereHasIn' : 'whereHas';
+
+        $model->$method(implode('.', $column), function ($relation) use ($params, $query) {
+            $relation->$query(...$params);
+        });
+    }
+
+    /**
+     * Html转义.
+     *
+     * @param array|string $item
+     *
+     * @return mixed
+     */
+    public static function htmlEntityEncode($item)
+    {
+        if (is_array($item)) {
+            array_walk_recursive($item, function (&$value) {
+                $value = htmlentities($value);
+            });
+        } else {
+            $item = htmlentities($item);
+        }
+
+        return $item;
+    }
+
+    /**
+     * 格式化表单元素 name 属性.
+     *
+     * @param string|array $name
+     *
+     * @return mixed|string
+     */
+    public static function formatElementName($name)
+    {
+        if (! $name) {
+            return $name;
+        }
+
+        if (is_array($name)) {
+            foreach ($name as &$v) {
+                $v = static::formatElementName($v);
+            }
+
+            return $name;
+        }
+
+        $name = explode('.', $name);
+
+        if (count($name) == 1) {
+            return $name[0];
+        }
+
+        $html = array_shift($name);
+        foreach ($name as $piece) {
+            $html .= "[$piece]";
+        }
+
+        return $html;
+    }
+
+    /**
+     * Set an array item to a given value using "dot" notation.
+     *
+     * If no key is given to the method, the entire array will be replaced.
+     *
+     * @param  array|\ArrayAccess  $array
+     * @param  string  $key
+     * @param  mixed   $value
+     * @return array
+     */
+    public static function arraySet(&$array, $key, $value)
+    {
+        if (is_null($key)) {
+            return $array = $value;
+        }
+
+        $keys = explode('.', $key);
+        $default = null;
+
+        while (count($keys) > 1) {
+            $key = array_shift($keys);
+
+            if (! isset($array[$key]) || (! is_array($array[$key]) && ! $array[$key] instanceof \ArrayAccess)) {
+                $array[$key] = [];
+            }
+
+            if (is_array($array)) {
+                $array = &$array[$key];
+            } else {
+                if (is_object($array[$key])) {
+                    $array[$key] = static::arraySet($array[$key], implode('.', $keys), $value);
+                } else {
+                    $mid = $array[$key];
+
+                    $array[$key] = static::arraySet($mid, implode('.', $keys), $value);
+                }
+            }
+        }
+
+        $array[array_shift($keys)] = $value;
+
+        return $array;
     }
 }

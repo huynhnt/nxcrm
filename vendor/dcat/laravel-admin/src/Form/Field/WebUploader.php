@@ -13,11 +13,6 @@ use Illuminate\Support\Str;
 trait WebUploader
 {
     /**
-     * @var array
-     */
-    protected $options = [];
-
-    /**
      * @param string      $extensions exp. gif,jpg,jpeg,bmp,png
      * @param string|null $mimeTypes  exp. image/*
      *
@@ -37,13 +32,13 @@ trait WebUploader
     }
 
     /**
-     * @param bool $disable
+     * @param bool $value
      *
      * @return $this
      */
-    public function disableChunked(bool $disable = true)
+    public function chunked(bool $value = true)
     {
-        $this->options['chunked'] = ! $disable;
+        $this->options['chunked'] = $value;
 
         return $this;
     }
@@ -56,6 +51,8 @@ trait WebUploader
     public function chunkSize(int $size)
     {
         $this->options['chunkSize'] = $size * 1024;
+
+        $this->checked(true);
 
         return $this;
     }
@@ -108,29 +105,29 @@ trait WebUploader
      *
      * @return $this
      */
-    public function disableAutoSave(bool $value = true)
+    public function autoSave(bool $value = true)
     {
-        $this->options['autoUpdateColumn'] = ! $value;
+        $this->options['autoUpdateColumn'] = $value;
 
         return $this;
     }
 
     /**
-     * Disable remove file.
+     * 禁用前端删除功能.
      *
      * @param bool $value
      *
      * @return $this
      */
-    public function disableRemove(bool $value = true)
+    public function removable(bool $value = true)
     {
-        $this->options['disableRemove'] = $value;
+        $this->options['disableRemove'] = ! $value;
 
         return $this;
     }
 
     /**
-     * Set upload server.
+     * 设置图片删除地址.
      *
      * @param string $server
      *
@@ -144,6 +141,8 @@ trait WebUploader
     }
 
     /**
+     * 设置上传表单请求参数.
+     *
      * @param array $data
      *
      * @return $this
@@ -151,6 +150,20 @@ trait WebUploader
     public function withFormData(array $data)
     {
         $this->options['formData'] = array_merge($this->options['formData'], $data);
+
+        return $this;
+    }
+
+    /**
+     * 设置删除图片请求参数.
+     *
+     * @param array $data
+     *
+     * @return $this
+     */
+    public function withDeleteData(array $data)
+    {
+        $this->options['deleteData'] = array_merge($this->options['deleteData'], $data);
 
         return $this;
     }
@@ -170,18 +183,34 @@ trait WebUploader
     }
 
     /**
-     * Set default options form file field.
+     * 是否开启图片压缩.
+     *
+     * @param bool|array $compress
+     *
+     * @return $this
+     */
+    public function compress($compress = true)
+    {
+        $this->options['compress'] = $compress;
+
+        return $this;
+    }
+
+    /**
+     * 默认上传配置.
      *
      * @return void
      */
-    protected function setupDefaultOptions()
+    protected function setUpDefaultOptions()
     {
+        $key = optional($this->form)->getKey();
+
         $defaultOptions = [
             'name'                => WebUploaderHelper::FILE_NAME,
             'fileVal'             => WebUploaderHelper::FILE_NAME,
             'isImage'             => false,
             'disableRemove'       => false,
-            'chunked'             => true,
+            'chunked'             => false,
             'fileNumLimit'        => 10,
             // 禁掉全局的拖拽功能。这样不会出现图片拖进页面的时候，把图片打开。
             'disableGlobalDnd'    => true,
@@ -189,15 +218,17 @@ trait WebUploader
             'fileSingleSizeLimit' => 10485760, // 10M
             'elementName'         => $this->getElementName(), // 字段name属性值
             'lang'                => trans('admin.uploader'),
+            'compress'            => false,
 
             'deleteData' => [
                 static::FILE_DELETE_FLAG => '',
-                '_token'                 => csrf_token(),
+                'primary_key'            => $key,
             ],
             'formData' => [
                 '_id'           => Str::random(),
                 '_token'        => csrf_token(),
                 'upload_column' => $this->column(),
+                'primary_key'   => $key,
             ],
         ];
 

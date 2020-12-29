@@ -9,7 +9,7 @@ use Dcat\Admin\Form;
 use Dcat\Admin\Grid;
 use Dcat\Admin\Show;
 use Dcat\Admin\Admin;
-use Dcat\Admin\Controllers\AdminController;
+use Dcat\Admin\Http\Controllers\AdminController;
 
 class EventController extends AdminController
 {
@@ -109,7 +109,7 @@ class EventController extends AdminController
                 }else {
                     return $form->redirect('customers/' . $form->customer_id, '保存成功');
                 }
-                
+
             });
 
             $form->deleted(function (Form $form, $result) {

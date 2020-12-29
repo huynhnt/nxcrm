@@ -6,7 +6,7 @@
         var Dcat = CreateDcat({!! Dcat\Admin\Admin::jsVariables() !!});
     </script>
 
-    {!! admin_section(\AdminSection::BODY_INNER_BEFORE) !!}
+    {!! admin_section(Dcat\Admin\Admin::SECTION['BODY_INNER_BEFORE']) !!}
 
     <div class="wrapper">
         @include('admin::partials.sidebar')
@@ -24,19 +24,18 @@
         <p class="clearfix blue-grey lighten-2 mb-0 text-center">
             <span class="text-center d-block d-md-inline-block mt-25">
                 Powered by
-                <a target="_blank" href="https://www.nx.tt">NXCRM</a>
+                <a target="_blank" href="https://github.com/jqhph/dcat-admin">Dcat Admin</a>
                 <span>&nbsp;·&nbsp;</span>
-                v{{ App\Admin\Controllers\SettingsController::VERSION }}
+                v{{ Dcat\Admin\Admin::VERSION }}
             </span>
 
             <button class="btn btn-primary btn-icon scroll-top pull-right" style="position: fixed;bottom: 2%; right: 10px;display: none">
                 <i class="feather icon-arrow-up"></i>
             </button>
         </p>
-
     </footer>
 
-    {!! admin_section(\AdminSection::BODY_INNER_AFTER) !!}
+    {!! admin_section(Dcat\Admin\Admin::SECTION['BODY_INNER_AFTER']) !!}
 
     {!! Dcat\Admin\Admin::asset()->jsToHtml() !!}
 

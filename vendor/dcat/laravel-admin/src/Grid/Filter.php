@@ -3,6 +3,10 @@
 namespace Dcat\Admin\Grid;
 
 use Dcat\Admin\Admin;
+use Dcat\Admin\Exception\RuntimeException;
+use Dcat\Admin\Grid\Events\ApplyFilter;
+use Dcat\Admin\Grid\Events\Fetched;
+use Dcat\Admin\Grid\Events\Fetching;
 use Dcat\Admin\Grid\Filter\AbstractFilter;
 use Dcat\Admin\Grid\Filter\Between;
 use Dcat\Admin\Grid\Filter\Date;
@@ -34,6 +38,7 @@ use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
+use Illuminate\Support\Traits\Macroable;
 
 /**
  * Class Filter.
@@ -64,6 +69,7 @@ use Illuminate\Support\Str;
 class Filter implements Renderable
 {
     use HasBuilderEvents;
+    use Macroable;
 
     const MODE_RIGHT_SIDE = 'right-side';
     const MODE_PANEL = 'panel';
@@ -190,6 +196,8 @@ class Filter implements Renderable
      */
     protected $mode = self::MODE_RIGHT_SIDE;
 
+    protected $conditions;
+
     /**
      * Create a new filter instance.
      *
@@ -223,9 +231,7 @@ class Filter implements Renderable
      */
     protected function formatFilterId()
     {
-        $gridName = $this->model->grid()->getName();
-
-        return 'filter-box'.($gridName ? '-'.$gridName : '');
+        return 'filter-box'.Str::random(8);
     }
 
     /**
@@ -372,28 +378,6 @@ class Filter implements Renderable
     }
 
     /**
-     * @param string $name
-     *
-     * @return $this
-     */
-    public function setName($name)
-    {
-        $this->name = $name;
-
-        $this->setFilterID("{$this->name}-{$this->filterID}");
-
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getName()
-    {
-        return $this->name;
-    }
-
-    /**
      * @return $this
      */
     public function withoutBorder()
@@ -460,6 +444,10 @@ class Filter implements Renderable
             return [];
         }
 
+        if ($this->conditions !== null) {
+            return $this->conditions;
+        }
+
         $params = [];
 
         foreach ($inputs as $key => $value) {
@@ -476,8 +464,12 @@ class Filter implements Renderable
             if (! empty($conditions)) {
                 $this->expand();
 
+                $this->grid()->fireOnce(new ApplyFilter([$conditions]));
+
                 $this->grid()->model()->disableBindTreeQuery();
             }
+
+            $this->conditions = $conditions;
         });
     }
 
@@ -488,14 +480,14 @@ class Filter implements Renderable
      */
     protected function sanitizeInputs(&$inputs)
     {
-        if (! $this->name) {
-            return $inputs;
+        if (! $prefix = $this->grid()->getNamePrefix()) {
+            return;
         }
 
-        $inputs = collect($inputs)->filter(function ($input, $key) {
-            return Str::startsWith($key, "{$this->name}_");
-        })->mapWithKeys(function ($val, $key) {
-            $key = str_replace("{$this->name}_", '', $key);
+        $inputs = collect($inputs)->filter(function ($input, $key) use ($prefix) {
+            return Str::startsWith($key, $prefix);
+        })->mapWithKeys(function ($val, $key) use ($prefix) {
+            $key = str_replace($prefix, '', $key);
 
             return [$key => $val];
         })->toArray();
@@ -559,7 +551,7 @@ class Filter implements Renderable
      */
     public function getScopeQueryName()
     {
-        return $this->grid()->getName().'_scope_';
+        return $this->grid()->makeName('_scope_');
     }
 
     /**
@@ -627,18 +619,24 @@ class Filter implements Renderable
     /**
      * Execute the filter with conditions.
      *
-     * @param bool $toArray
-     *
-     * @return array|Collection|mixed
+     * @return Collection|mixed
      */
-    public function execute(bool $toArray = true)
+    public function execute()
     {
         $conditions = array_merge(
             $this->getConditions(),
             $this->getScopeConditions()
         );
 
-        return $this->model->addConditions($conditions)->buildData($toArray);
+        $this->model->addConditions($conditions);
+
+        $this->grid()->fireOnce(new Fetching());
+
+        $data = $this->model->buildData();
+
+        $this->grid()->fireOnce(new Fetched([&$data]));
+
+        return $data;
     }
 
     /**
@@ -772,7 +770,7 @@ class Filter implements Renderable
         if (! empty(static::$supports[$method])) {
             $class = static::$supports[$method];
             if (! is_subclass_of($class, AbstractFilter::class)) {
-                throw new \InvalidArgumentException("The class [{$class}] must be a type of ".AbstractFilter::class.'.');
+                throw new RuntimeException("The class [{$class}] must be a type of ".AbstractFilter::class.'.');
             }
 
             return $this->addFilter(new $class(...$arguments));

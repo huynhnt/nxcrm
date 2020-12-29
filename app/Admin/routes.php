@@ -38,6 +38,6 @@ Route::group([
     //线索
     $router->resource('opportunitys', 'OpportunityController');
 
-    // 网站配置;
-    Route::get('/settings', 'SettingsController@index')->name('settings.index');
+    //网站配置
+    Route::get('/settings/{classinfo}', 'SettingsController@index')->name('settings.index');
 });

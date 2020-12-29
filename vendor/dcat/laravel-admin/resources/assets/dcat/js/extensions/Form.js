@@ -16,6 +16,8 @@ class Form {
             validate: false,
             // 确认弹窗
             confirm: {title: null, content: null},
+            // 是否使用Toastr展示字段验证错误信息
+            validationErrorToastr: false,
             // 表单错误信息class
             errorClass: 'has-error',
             // 表单错误信息容器选择器
@@ -28,8 +30,6 @@ class Form {
             errorTemplate: '<label class="control-label" for="inputError"><i class="feather icon-x-circle"></i> {message}</label><br/>',
             // 是否允许跳转
             redirect: true,
-            // 保存成功后自动跳转
-            autoRedirect: false,
             // 自动移除表单错误信息
             autoRemoveError: true,
             // 表单提交之前事件监听，返回false可以中止表单继续提交
@@ -46,25 +46,24 @@ class Form {
         _this.$form = $(_this.options.form).first();
         _this._errColumns = {};
 
-        _this.submit();
+        _this.init();
     }
 
-    submit() {
+    init() {
         let _this = this;
         let confirm = _this.options.confirm;
 
         if (! confirm.title) {
-            return _this._ajaxSubmit();
+            return _this.submit();
         }
 
         Dcat.confirm(confirm.title, confirm.content, function () {
-            _this._ajaxSubmit();
+            _this.submit();
         });
     }
 
-    _ajaxSubmit() {
-        let Dcat = window.Dcat,
-            _this = this,
+    submit() {
+        let _this = this,
             $form = _this.$form,
             options = _this.options,
             $submitButton = $form.find('[type="submit"],.submit');
@@ -95,7 +94,9 @@ class Form {
                 $submitButton.buttonLoading();
             },
             success: function (response) {
-                $submitButton.buttonLoading(false);
+                setTimeout(function () {
+                    $submitButton.buttonLoading(false);
+                }, 700);
 
                 if (options.after(true, response, _this) === false) {
                     return;
@@ -109,35 +110,15 @@ class Form {
                     return;
                 }
 
-
-                if (! response.status) {
-                    Dcat.error(response.message || 'Save failed!');
-                    return;
-                }
-
-                Dcat.success(response.message || 'Save succeeded!');
-
-                if (typeof response.location !== "undefined") {
-                    return setTimeout(function () {
-                        if (response.location) {
-                            location.href = response.location;
-                        } else {
-                            location.reload();
-                        }
-                    }, 1500)
-                }
-
                 if (response.redirect === false || ! options.redirect) {
-                    return;
+                    if (response.data && response.data.then) {
+                        delete response.data['then'];
+                        delete response.data['then'];
+                        delete response.data['then'];
+                    }
                 }
 
-                if (response.redirect) {
-                    return Dcat.reload(response.redirect);
-                }
-
-                if (options.autoRedirect) {
-                    history.back(-1);
-                }
+                Dcat.handleJsonResponse(response);
             },
             error: function (response) {
                 $submitButton.buttonLoading(false);
@@ -191,6 +172,10 @@ class Form {
                     $group.find(_this.options.errorContainerSelector).first().append(
                         _this.options.errorTemplate.replace('{message}', msg[j])
                     );
+                }
+
+                if (_this.options.validationErrorToastr) {
+                    Dcat.error(msg.join('<br/>'));
                 }
             };
 

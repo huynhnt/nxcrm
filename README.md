@@ -69,8 +69,8 @@ Nxcrm基于laravel开发，得益于优秀的后台框架`Dact Admin`，使得Nx
 
 ## 环境
  ---
- - PHP >= 7.1.0
- - Laravel 7.*
+ - PHP >= 7.2.0
+ - Mysql >= 5.7
  - Fileinfo PHP Extension  (一定安装这个扩展)
   
  ## 安装

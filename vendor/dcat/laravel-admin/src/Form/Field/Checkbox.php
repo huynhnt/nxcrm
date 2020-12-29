@@ -9,12 +9,13 @@ class Checkbox extends MultipleSelect
 {
     use CanCascadeFields;
 
-    public static $css = [];
-    public static $js = [];
-
     protected $style = 'primary';
 
     protected $cascadeEvent = 'change';
+
+    protected $canCheckAll = false;
+
+    protected $inline = true;
 
     /**
      * @param array|\Closure|string $options
@@ -49,6 +50,25 @@ class Checkbox extends MultipleSelect
     }
 
     /**
+     * Add a checkbox above this component, so you can select all checkboxes by click on it.
+     *
+     * @return $this
+     */
+    public function canCheckAll()
+    {
+        $this->canCheckAll = true;
+
+        return $this;
+    }
+
+    public function inline(bool $inline)
+    {
+        $this->inline = $inline;
+
+        return $this;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function render()
@@ -72,16 +92,26 @@ class Checkbox extends MultipleSelect
         }
 
         $checkbox
-            ->inline()
-            ->check(old($this->column, $this->value()))
+            ->inline($this->inline)
+            ->check($this->value())
             ->class($this->getElementClassString());
 
         $this->addVariables([
             'checkbox' => $checkbox,
+            'checkAll' => $this->makeCheckAllCheckbox(),
         ]);
 
-        $this->script = ';';
-
         return parent::render();
+    }
+
+    protected function makeCheckAllCheckbox()
+    {
+        if (! $this->canCheckAll) {
+            return;
+        }
+
+        $this->addVariables(['canCheckAll' => $this->canCheckAll]);
+
+        return WidgetCheckbox::make('_check_all_', [__('admin.all')]);
     }
 }

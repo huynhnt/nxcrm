@@ -4,6 +4,7 @@ namespace Dcat\Admin\Layout;
 
 use Closure;
 use Dcat\Admin\Admin;
+use Dcat\Admin\Exception\RuntimeException;
 use Dcat\Admin\Traits\HasBuilderEvents;
 use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Support\Str;
@@ -54,11 +55,6 @@ class Content implements Renderable
      * @var array
      */
     protected $config = [];
-
-    /**
-     * @var bool
-     */
-    protected $usingPerfectScrollbar = false;
 
     /**
      * Content constructor.
@@ -157,20 +153,6 @@ class Content implements Renderable
     }
 
     /**
-     * @param bool $value
-     *
-     * @return $this
-     *
-     * @deprecated
-     */
-    public function perfectScrollbar(bool $value = true)
-    {
-        $this->usingPerfectScrollbar = $value;
-
-        return $this;
-    }
-
-    /**
      * @param array $breadcrumb
      *
      * @throws \Exception
@@ -180,21 +162,21 @@ class Content implements Renderable
     protected function formatBreadcrumb(array &$breadcrumb)
     {
         if (! $breadcrumb) {
-            throw new \Exception('Breadcrumb format error!');
+            throw new RuntimeException('Breadcrumb format error!');
         }
 
         $notArray = false;
         foreach ($breadcrumb as &$item) {
             $isArray = is_array($item);
             if ($isArray && ! isset($item['text'])) {
-                throw new \Exception('Breadcrumb format error!');
+                throw new RuntimeException('Breadcrumb format error!');
             }
             if (! $isArray && $item) {
                 $notArray = true;
             }
         }
         if (! $breadcrumb) {
-            throw new \Exception('Breadcrumb format error!');
+            throw new RuntimeException('Breadcrumb format error!');
         }
         if ($notArray) {
             $breadcrumb = [
@@ -279,13 +261,35 @@ class Content implements Renderable
      */
     public function build()
     {
-        $html = '';
+        try {
+            $html = '';
 
-        foreach ($this->rows as $row) {
-            $html .= $row->render();
+            foreach ($this->rows as $row) {
+                $html .= $row->render();
+            }
+
+            return $html;
+        } catch (\Throwable $e) {
+            return $this->handleException($e);
+        }
+    }
+
+    /**
+     * @param \Throwable $e
+     *
+     * @return mixed|string
+     */
+    protected function handleException(\Throwable $e)
+    {
+        $response = Admin::handleException($e);
+
+        if (is_string($response) || $response instanceof Renderable) {
+            $row = new Row($response);
+
+            return $row->render();
         }
 
-        return $html;
+        return $response;
     }
 
     /**
@@ -407,37 +411,6 @@ class Content implements Renderable
     }
 
     /**
-     * 页面滚动条优化.
-     */
-    protected function addPerfectScrollbarScript()
-    {
-        if (! $this->usingPerfectScrollbar) {
-            return;
-        }
-
-        Admin::script(
-            <<<'JS'
-(function () {
-    if ($(window).width() > 768) {
-        var ps, wps;
-        if ($('.full-page .wrapper').length) {
-            wps = new PerfectScrollbar('.full-page .wrapper');
-        }
-        ps = new PerfectScrollbar('html');
-        $(document).one('pjax:send',function () {
-            ps && ps.destroy();
-            ps = null; 
-              
-            wps && wps.destroy();
-            wps = null; 
-        });
-    }
-})()
-JS
-        );
-    }
-
-    /**
      * @return array
      */
     protected function variables()
@@ -446,26 +419,25 @@ JS
             'header'          => $this->title,
             'description'     => $this->description,
             'breadcrumb'      => $this->breadcrumb,
-            'configData'      => $this->applClasses(),
-            'content'         => $this->build(),
-            'pjaxContainerId' => Admin::$pjaxContainerId,
+            'configData'      => $this->applyClasses(),
+            'pjaxContainerId' => Admin::getPjaxContainerId(),
         ], $this->variables);
     }
 
     /**
      * @return array
      */
-    protected function applClasses()
+    protected function applyClasses()
     {
         // default data array
         $defaultData = [
-            'theme' => '',
+            'theme'             => '',
             'sidebar_collapsed' => false,
-            'sidebar_dark' => false,
-            'navbar_color' => '',
-            'navbar_class' => 'sticky',
-            'footer_type' => '',
-            'body_class' => '',
+            'sidebar_style'     => 'sidebar-light-primary',
+            'navbar_color'      => '',
+            'navbar_class'      => 'sticky',
+            'footer_type'       => '',
+            'body_class'        => '',
         ];
 
         $data = array_merge(
@@ -473,14 +445,19 @@ JS
             $this->config
         );
 
+        // 1.0 版本兼容 sidebar_dark 参数
+        if (empty($data['sidebar_style']) && ! empty($data['sidebar_dark'])) {
+            $data['sidebar_style'] = 'sidebar-dark-white';
+        }
+
         $allOptions = [
-            'theme' => '',
-            'footer_type' => '',
-            'body_class' => '',
-            'sidebar_dark' => '',
-            'sidebar_collapsed' => [true, false],
-            'navbar_color' => ['bg-primary', 'bg-info', 'bg-warning', 'bg-success', 'bg-danger', 'bg-dark'],
-            'navbar_class' => ['floating' => 'floating-nav', 'sticky' => 'fixed-top', 'hidden' => 'd-none'],
+            'theme'             => '',
+            'footer_type'       => '',
+            'body_class'        => '',
+            'sidebar_style'     => ['light' => 'sidebar-light-primary', 'primary' => 'sidebar-primary', 'dark' => 'sidebar-dark-white'],
+            'sidebar_collapsed' => [],
+            'navbar_color'      => [],
+            'navbar_class'      => ['floating' => 'floating-nav', 'sticky' => 'fixed-top', 'hidden' => 'd-none'],
         ];
 
         $maps = [
@@ -504,20 +481,24 @@ JS
             ) {
                 $data[$key] = $defaultData[$key];
             }
+
+            if (! is_array($data[$key]) && isset($value[$data[$key]])) {
+                $data[$key] = $value[$data[$key]];
+            }
         }
 
         if ($data['body_class'] && Str::contains($data['body_class'], 'dark-mode')) {
-            $data['sidebar_dark'] = true;
+            $data['sidebar_style'] = 'sidebar-dark-white';
         }
 
         return [
-            'theme' => $data['theme'],
+            'theme'             => $data['theme'],
             'sidebar_collapsed' => $data['sidebar_collapsed'],
-            'navbar_color' => $data['navbar_color'],
-            'navbar_class' => $allOptions['navbar_class'][$data['navbar_class']],
-            'sidebar_class' => $data['sidebar_collapsed'] ? 'sidebar-collapse' : '',
-            'body_class' => $data['body_class'],
-            'sidebar_dark' => $data['sidebar_dark'],
+            'navbar_color'      => $data['navbar_color'],
+            'navbar_class'      => $allOptions['navbar_class'][$data['navbar_class']],
+            'sidebar_class'     => $data['sidebar_collapsed'] ? 'sidebar-collapse' : '',
+            'body_class'        => $data['body_class'],
+            'sidebar_style'     => $data['sidebar_style'],
         ];
     }
 
@@ -531,13 +512,11 @@ JS
         $this->callComposing();
         $this->shareDefaultErrors();
 
-        $variables = $this->variables();
+        $this->variables['content'] = $this->build();
 
         $this->callComposed();
 
-        $this->addPerfectScrollbarScript();
-
-        return view($this->view, $variables)->render();
+        return view($this->view, $this->variables())->render();
     }
 
     /**

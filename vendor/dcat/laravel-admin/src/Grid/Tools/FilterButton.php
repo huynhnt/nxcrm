@@ -43,7 +43,7 @@ class FilterButton extends AbstractTool
     /**
      * Set up script for filter button.
      */
-    protected function setupScripts()
+    protected function addScript()
     {
         $filter = $this->filter();
         $id = $filter->filterID();
@@ -84,7 +84,15 @@ class FilterButton extends AbstractTool
         return false
     });
     
-    $('.wrapper').on('click', function () {
+    $('.wrapper').on('click', '.modal', function (e) {
+        if (typeof e.cancelBubble != "undefined") {
+            e.cancelBubble = true;
+        }
+        if (typeof e.stopPropagation != "undefined") {
+            e.stopPropagation();
+        }
+    });
+    $(document).on('click', '.wrapper', function (e) {
         if (slider && slider.close) {
             slider.close();
         }
@@ -140,7 +148,7 @@ JS;
             return;
         }
 
-        $this->setupScripts();
+        $this->addScript();
 
         $onlyScopes = ((! $filters || $this->parent->option('show_filter') === false) && ! $scopres->isEmpty()) ? true : false;
 

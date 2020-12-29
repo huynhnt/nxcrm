@@ -2,7 +2,6 @@
 
 namespace Dcat\Admin\Form\Field;
 
-use Dcat\Admin\Admin;
 use Dcat\Admin\Form\Field;
 use Dcat\Admin\Support\Helper;
 use Illuminate\Support\Arr;
@@ -55,17 +54,13 @@ class ListField extends Field
     }
 
     /**
-     * Fill data to the field.
-     *
-     * @param array $data
-     *
-     * @return array
+     * {@inheritdoc}
      */
     public function formatFieldData($data)
     {
         $this->data = $data;
 
-        return Helper::array(Arr::get($data, $this->column, $this->value));
+        return Helper::array(Arr::get($data, $this->normalizeColumn(), $this->value));
     }
 
     /**
@@ -136,40 +131,15 @@ class ListField extends Field
     /**
      * {@inheritdoc}
      */
-    protected function addScript()
-    {
-        $value = old($this->column, $this->value());
-
-        $number = $value ? count($value) : 0;
-
-        $this->script = <<<JS
-(function () {
-    var index = {$number};
-    $('.{$this->column}-add').on('click', function () {
-        var tpl = $('template.{$this->column}-tpl').html().replace('{key}', index);
-        $('tbody.list-{$this->column}-table').append(tpl);
-        
-        index++;
-    });
-    $('tbody').on('click', '.{$this->column}-remove', function () {
-        $(this).closest('tr').remove();
-    });
-})();
-JS;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     protected function prepareInputValue($value)
     {
         unset($value['values'][static::DEFAULT_FLAG_NAME]);
 
         if (empty($value['values'])) {
-            return '[]';
+            return [];
         }
 
-        return json_encode(array_values($value['values']));
+        return array_values($value['values']);
     }
 
     /**
@@ -177,9 +147,9 @@ JS;
      */
     public function render()
     {
-        $this->addScript();
+        $value = $this->value();
 
-        Admin::style('td .form-group {margin-bottom: 0 !important;}');
+        $this->addVariables(['count' => $value ? count($value) : 0]);
 
         return parent::render();
     }

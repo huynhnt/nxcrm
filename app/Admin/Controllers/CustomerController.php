@@ -10,7 +10,7 @@ use Dcat\Admin\IFrameGrid;
 use App\Models\Event;
 use Dcat\Admin\Widgets\Card;
 use Dcat\Admin\Layout\Content;
-use Dcat\Admin\Controllers\AdminController;
+use Dcat\Admin\Http\Controllers\AdminController;
 use Dcat\Admin\Admin;
 
 class CustomerController extends AdminController

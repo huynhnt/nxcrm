@@ -10,7 +10,7 @@
                 <ul class="nav navbar-nav">
                     <li class="nav-item mr-auto" style="margin: 10px 0 0 25px;">
                         <a class="navbar-brand waves-effect waves-light"  data-widget="pushmenu" style="cursor: pointer;">
-                            <span class="logo-lg" style="font-size: 18px;"><img src="/uploads/{!! config('settings.logo') !!}" width="35"> &nbsp;{!! config('settings.crmname') !!}</span>
+                            <span class="logo-lg" style="font-size: 18px;"><img src="/storage/{!! admin_setting('logo', public_path().'/static/img/logo.png') !!}" width="35"> &nbsp;{!! admin_setting('crmname', 'CRM客户管理系统') !!}</span>
                         </a>
                     </li>
                 </ul>
@@ -25,9 +25,9 @@
                 </div>
                 <ul class="nav navbar-nav float-right">
                     {{--User Account Menu--}}
-                    {!! admin_section(AdminSection::NAVBAR_USER_PANEL) !!}
+                    {!! admin_section(Dcat\Admin\Admin::SECTION['NAVBAR_USER_PANEL']) !!}
 
-                    {!! admin_section(AdminSection::NAVBAR_AFTER_USER_PANEL) !!}
+                    {!! admin_section(Dcat\Admin\Admin::SECTION['NAVBAR_AFTER_USER_PANEL']) !!}
                 </ul>
             </div>
         </div>

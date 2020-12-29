@@ -3,6 +3,7 @@
 namespace Dcat\Admin\Grid\Displayers;
 
 use Dcat\Admin\Admin;
+use Dcat\Admin\Support\Helper;
 
 class Editable extends AbstractDisplayer
 {
@@ -13,11 +14,13 @@ class Editable extends AbstractDisplayer
         $this->addScript();
         $this->addStyle();
 
+        $value = Helper::render($this->value);
+
         $label = __('admin.save');
 
         return <<<HTML
 <div class="d-inline">
-    <span class="{$this->selector}" contenteditable="true">{$this->value}</span>
+    <span class="{$this->selector}" contenteditable="true">{$value}</span>
     <span class="save hidden" 
         data-value="{$this->value}" 
         data-name="{$this->column->getName()}" 
@@ -54,7 +57,7 @@ CSS
     protected function addScript()
     {
         $script = <<<JS
-$(".{$this->selector}").on("click", function() {
+$(".{$this->selector}").on("click focus", function() {
     $(this).next().removeClass("hidden");
 }).on('blur', function () {
     var icon = $(this).next();
@@ -75,10 +78,7 @@ $('.{$this->selector}+.save').on("click",function() {
 
     value = tmp.text().replace(new RegExp("<br>","g"), '').replace(new RegExp("&nbsp;","g"), '').trim();
     
-    var data = {
-        _token: Dcat.token,
-        _method: 'PUT'
-    };
+    var data = {};
     if (name.indexOf('.') === -1) {
         data[name] = value;
     } else {
@@ -89,19 +89,19 @@ $('.{$this->selector}+.save').on("click",function() {
     }
     
     Dcat.NP.start();
-    $.ajax({
+    $.put({
         url: url,
-        type: "POST",
         data: data,
-        success: function (data) {
-            if (data.status) {
+        success: function (d) {
+            var msg = d.data.message || d.message;
+            if (d.status) {
                 obj.attr('data-value',value).addClass("hidden").prev().html(value);
-                Dcat.success(data.message);
+                Dcat.success(msg);
                 
                 refresh && Dcat.reload()
             } else {
                 obj.prev().html(old_value);
-                Dcat.error(data.message);
+                Dcat.error(msg);
             }
         },
         error:function(a,b,c) {

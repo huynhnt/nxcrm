@@ -2,55 +2,29 @@
 
 namespace Dcat\Admin\Grid\Displayers;
 
-use Dcat\Admin\Admin;
+use Dcat\Admin\Contracts\LazyRenderable;
 use Dcat\Admin\Support\Helper;
-use Dcat\Admin\Support\LazyRenderable;
-use Illuminate\Support\Str;
+use Dcat\Admin\Widgets\Modal as WidgetModal;
 
 class Modal extends AbstractDisplayer
 {
     protected $title;
+
+    protected $xl = false;
 
     public function title(string $title)
     {
         $this->title = $title;
     }
 
-    protected function generateElementId()
+    public function xl()
     {
-        $key = Str::random(8);
-
-        return 'grid-modal-'.$this->grid->getName().$key;
+        $this->xl = true;
     }
 
-    protected function addRenderableScript(string $modalId, string $url)
+    protected function setUpLazyRenderable(LazyRenderable $renderable)
     {
-        $script = <<<JS
-(function () {
-    var modal = $('#{$modalId}');
-    
-    modal.on('show.bs.modal', function (e) {
-        modal.find('.modal-body').html('<div style="min-height:150px"></div>');
-    
-        modal.find('.modal-body').loading();
-        
-        $.ajax('{$url}').then(function (data) {
-            modal.find('.modal-body').html(data);
-        });
-    })
-})();
-JS;
-
-        Admin::script($script);
-    }
-
-    protected function setUpLazyRenderable(string $modalId, LazyRenderable $renderable)
-    {
-        $renderable->with('key', $this->getKey());
-
-        $this->addRenderableScript($modalId, $renderable->getUrl());
-
-        $renderable::collectAssets();
+        return clone $renderable->payload(['key' => $this->getKey()]);
     }
 
     public function display($callback = null)
@@ -61,7 +35,6 @@ JS;
         }
 
         $html = $this->value;
-        $id = $this->generateElementId();
 
         if ($callback instanceof \Closure) {
             $callback = $callback->call($this->row, $this);
@@ -73,37 +46,26 @@ JS;
             }
         }
 
-        if (is_string($callback) && is_subclass_of($callback, LazyRenderable::class)) {
-            $html = '';
-
-            $this->setUpLazyRenderable($id, $callback::make());
-        } elseif ($callback instanceof LazyRenderable) {
-            $html = '';
-
-            $this->setUpLazyRenderable($id, $callback);
+        if ($callback && is_string($callback) && is_subclass_of($callback, LazyRenderable::class)) {
+            $html = $this->setUpLazyRenderable($callback::make());
+        } elseif ($callback && $callback instanceof LazyRenderable) {
+            $html = $this->setUpLazyRenderable($callback);
         }
 
         $title = $this->title ?: $title;
 
-        return <<<EOT
-<span class="grid-expand" data-toggle="modal" data-target="#{$id}">
-   <a href="javascript:void(0)"><i class="fa fa-clone"></i>&nbsp;&nbsp;{$this->value}</a>
-</span>
+        return WidgetModal::make()
+            ->when(true, function ($modal) {
+                $this->xl ? $modal->xl() : $modal->lg();
+            })
+            ->title($title)
+            ->body($html)
+            ->delay(300)
+            ->button($this->renderButton());
+    }
 
-<div class="modal fade" id="{$id}" role="dialog">
-  <div class="modal-dialog modal-lg">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h4 class="modal-title">{$title}</h4>
-         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-      </div>
-      <div class="modal-body">
-        {$html}
-      </div>
-    </div>
-  </div>
-</div>
-
-EOT;
+    protected function renderButton()
+    {
+        return "<a href=\"javascript:void(0)\"><i class=\"fa fa-clone\"></i>&nbsp;&nbsp;{$this->value}</a>";
     }
 }

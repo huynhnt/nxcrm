@@ -4,14 +4,6 @@ namespace Dcat\Admin\Form\Field;
 
 class Color extends Text
 {
-    protected static $css = [
-        '@admin/dcat/plugins/bootstrap-colorpicker/css/bootstrap-colorpicker.min.css',
-    ];
-
-    protected static $js = [
-        '@admin/dcat/plugins/bootstrap-colorpicker/js/bootstrap-colorpicker.min.js',
-    ];
-
     protected $view = 'admin::form.color';
 
     /**
@@ -21,7 +13,7 @@ class Color extends Text
      */
     public function hex()
     {
-        return $this->options(['format' => 'hex']);
+        return $this->mergeOptions(['format' => 'hex']);
     }
 
     /**
@@ -31,7 +23,7 @@ class Color extends Text
      */
     public function rgb()
     {
-        return $this->options(['format' => 'rgb']);
+        return $this->mergeOptions(['format' => 'rgb']);
     }
 
     /**
@@ -41,18 +33,7 @@ class Color extends Text
      */
     public function rgba()
     {
-        return $this->options(['format' => 'rgba']);
-    }
-
-    protected function addScript()
-    {
-        $options = json_encode($this->options);
-
-        $this->script = <<<JS
-$('{$this->getElementClassSelector()}').colorpicker($options).on('colorpickerChange', function(event) {
-    $(this).parents('.input-group').find('.input-group-prepend i').css('background-color', event.color.toString());
-});
-JS;
+        return $this->mergeOptions(['format' => 'rgba']);
     }
 
     /**
@@ -62,8 +43,6 @@ JS;
      */
     public function render()
     {
-        $this->addScript();
-
         $this->defaultAttribute('style', 'width: 160px;flex:none');
 
         return parent::render();

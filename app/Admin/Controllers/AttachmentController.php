@@ -7,7 +7,7 @@ use Dcat\Admin\Form;
 use Dcat\Admin\Grid;
 use Dcat\Admin\Show;
 use Illuminate\Http\Request;
-use Dcat\Admin\Controllers\AdminController;
+use Dcat\Admin\Http\Controllers\AdminController;
 
 class AttachmentController extends AdminController
 {
@@ -98,12 +98,14 @@ class AttachmentController extends AdminController
             $form->display('updated_at');
 
             $form->saved(function (Form $form) {
-                if ($this->contractid) {
-                    return $form->redirect('contracts/' . $form->contract_id, '保存成功');
-                } elseif ($this->opportunityid) {
-                    return $form->redirect('opportunitys/' . $form->opportunity_id, '保存成功');
+                if ($form->crm_contract_id) {
+                    return $form->response()->success('保存成功')->redirect('contracts/' . $form->crm_contract_id);
+                } elseif ($form->crm_opportunity_id) {
+                    return $form->response()->success('保存成功')->redirect('opportunitys/' . $form->crm_opportunity_id);
+                } elseif ($form->crm_invoice_id) {
+                    return $form->response()->success('保存成功')->redirect('invoices/' . $form->crm_invoice_id);
                 } else {
-                    return $form->redirect('customers/' . $form->customer_id, '保存成功');
+                    return $form->response()->success('保存成功')->redirect('customers/' . $form->crm_customer_id);
                 }
             });
 

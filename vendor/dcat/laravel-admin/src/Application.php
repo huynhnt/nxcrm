@@ -4,9 +4,12 @@ namespace Dcat\Admin;
 
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Traits\Macroable;
 
 class Application
 {
+    use Macroable;
+
     const DEFAULT = 'admin';
 
     /**
@@ -81,7 +84,7 @@ class Application
         if ($this->apps) {
             $this->registerMultiAppRoutes();
 
-            $this->withConfig(static::DEFAULT);
+            $this->switch(static::DEFAULT);
         }
     }
 
@@ -97,13 +100,13 @@ class Application
         if ($this->apps) {
             foreach ($this->apps as $app => $enable) {
                 if ($enable) {
-                    $this->withConfig($app);
+                    $this->switch($app);
 
                     $this->loadRoutesFrom($pathOrCallback, $app);
                 }
             }
 
-            $this->withConfig(static::DEFAULT);
+            $this->switch(static::DEFAULT);
         }
     }
 
@@ -141,7 +144,7 @@ class Application
      */
     protected function registerRoute(?string $app)
     {
-        $this->withConfig($app);
+        $this->switch($app);
 
         $this->loadRoutesFrom(function () use ($app) {
             Admin::registerApiRoutes($this->getApiRoutePrefix($app));
