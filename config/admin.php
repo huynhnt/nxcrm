@@ -278,7 +278,7 @@ return [
     */
     'layout' => [
         // default, blue, blue-light, green
-        'color' => 'default',
+        'color' => 'wechat',
 
         'body_class' => '',
 
