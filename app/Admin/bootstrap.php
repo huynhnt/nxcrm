@@ -33,9 +33,6 @@ Dcat\Admin\Color::extend('wechat', [
 Grid::resolving(function (Grid $grid) {
     $grid->tableCollapse(false);
 });
-Admin::baseCss(['static/css/nxcrm.css'], true);
-Admin::asset()->alias('@nunito', null, '');
-Admin::asset()->alias('@montserrat', null, '');
 
 Dcat\Admin\Color::extend('douyin', [
     'primary'        => '#fe2d54',
@@ -48,11 +45,9 @@ Dcat\Admin\Color::extend('douyin', [
 admin_inject_section('isadmin', function () {
     $setting_menu = [
         'admin/settings/setting',
-        'admin/settings/highseas',
         'admin/auth/users',
         'admin/auth/roles',
         'admin/products',
-        'admin/customfields'
     ];
     $route = request()->path();
     $isadmin = in_array($route, $setting_menu);
@@ -106,3 +101,6 @@ config([
     'admin.layout.color' => admin_setting('color'),
 ]);
 
+Admin::baseCss(['static/css/nxcrm.css'], true);
+Admin::asset()->alias('@nunito', null, '');
+Admin::asset()->alias('@montserrat', null, '');
