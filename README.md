@@ -24,7 +24,7 @@ NXCRM 是宁夏南相开发的客户管理系统，包含了线索，商机，�
 
 
 ## 演示：
-https://crm.demo.nx.tt/admin
+https://nx.tt
 
 ## 环境要求
 
