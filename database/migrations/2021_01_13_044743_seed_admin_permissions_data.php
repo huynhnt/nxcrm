@@ -58,7 +58,7 @@ class SeedAdminPermissionsData extends Migration
         ];//
         DB::table('admin_role_menu')->insert($admin_role_menu);
         DB::table('admin_roles')->truncate();
-        $admin_role_menu = [
+        $admin_roles = [
             [
                 'id' => '1',
                 'name' => '创始人',
@@ -72,7 +72,7 @@ class SeedAdminPermissionsData extends Migration
         ];//
         DB::table('admin_roles')->insert($admin_roles);
         DB::table('admin_role_users')->truncate();
-        $admin_role_menu = [
+        $admin_role_users = [
             [
                 'role_id' => '1',
                 'user_id' => '1',
