@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="693114c5-d28b-449f-b4e5-b10bfb192720" name="默认的" comment="修复数据库迁移顺序">
+    <list default="true" id="693114c5-d28b-449f-b4e5-b10bfb192720" name="默认的" comment="版本介绍">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/database/seeds/AdminTablesSeeder.php" beforeDir="false" afterPath="$PROJECT_DIR$/database/factories/AdminTablesSeeder.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/database/migrations/2021_01_13_044743_seed_admin_permissions_data.php" beforeDir="false" afterPath="$PROJECT_DIR$/database/migrations/2021_01_13_044743_seed_admin_permissions_data.php" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -139,6 +139,7 @@
     <option name="showLibraryContents" value="true" />
   </component>
   <component name="PropertiesComponent">
+    <property name="ASKED_ADD_EXTERNAL_FILES" value="true" />
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
@@ -182,7 +183,9 @@
       <workItem from="1609215016789" duration="9000" />
       <workItem from="1609215947537" duration="360000" />
       <workItem from="1609217086503" duration="986000" />
-      <workItem from="1609243905871" duration="140000" />
+      <workItem from="1609243905871" duration="1010000" />
+      <workItem from="1610483088783" duration="2863000" />
+      <workItem from="1610510738584" duration="364000" />
     </task>
     <task id="LOCAL-00001" summary="优化后端界面，优化配置项，后台菜单独立">
       <created>1609207649201</created>
@@ -247,7 +250,28 @@
       <option name="project" value="LOCAL" />
       <updated>1609217462386</updated>
     </task>
-    <option name="localTasksCounter" value="10" />
+    <task id="LOCAL-00010" summary="修复数据库迁移顺序">
+      <created>1609244272985</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1609244272985</updated>
+    </task>
+    <task id="LOCAL-00011" summary="修复菜单权限的问题">
+      <created>1610485546253</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1610485546253</updated>
+    </task>
+    <task id="LOCAL-00012" summary="版本介绍">
+      <created>1610485961417</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1610485961417</updated>
+    </task>
+    <option name="localTasksCounter" value="13" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -272,6 +296,8 @@
     <MESSAGE value="增加多种主题配色，增加登录页简洁模式切换" />
     <MESSAGE value="排除文件" />
     <MESSAGE value="修复数据库迁移顺序" />
-    <option name="LAST_COMMIT_MESSAGE" value="修复数据库迁移顺序" />
+    <MESSAGE value="修复菜单权限的问题" />
+    <MESSAGE value="版本介绍" />
+    <option name="LAST_COMMIT_MESSAGE" value="版本介绍" />
   </component>
 </project>

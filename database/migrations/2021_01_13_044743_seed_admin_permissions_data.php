@@ -57,6 +57,32 @@ class SeedAdminPermissionsData extends Migration
             ]
         ];//
         DB::table('admin_role_menu')->insert($admin_role_menu);
+        DB::table('admin_roles')->truncate();
+        $admin_role_menu = [
+            [
+                'id' => '1',
+                'name' => '创始人',
+                'slug' => 'administrator',
+            ],
+            [
+                'id' => '2',
+                'name' => '职员',
+                'slug' => 'staff',
+            ]
+        ];//
+        DB::table('admin_roles')->insert($admin_roles);
+        DB::table('admin_role_users')->truncate();
+        $admin_role_menu = [
+            [
+                'role_id' => '1',
+                'user_id' => '1',
+            ],
+            [
+                'role_id' => '2',
+                'user_id' => '2',
+            ]
+        ];//
+        DB::table('admin_role_users')->insert($admin_role_users);
     }
 
     /**
