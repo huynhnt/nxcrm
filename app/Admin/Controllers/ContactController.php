@@ -109,11 +109,11 @@ class ContactController extends AdminController
             $form->hidden('customer_id')->value($customerid);
 
             $form->saved(function (Form $form) {
-                return $form->redirect('customers/' . $form->customer_id, '保存成功');
+                return $form->response()->success('保存成功')->redirect('customers/' . $form->customer_id);
             });
 
             $form->deleted(function (Form $form) {
-                return $form->redirect(back(), '删除成功');
+                return $form->response()->success('删除成功')->redirect('contacts/');
             });
         });
     }

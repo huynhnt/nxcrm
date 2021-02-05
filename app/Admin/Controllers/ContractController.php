@@ -7,10 +7,10 @@ use Dcat\Admin\Form;
 use Dcat\Admin\Grid;
 use Dcat\Admin\Show;
 use Dcat\Admin\Layout\Content;
+use App\Admin\Renderable\CustomerTable;
 use Dcat\Admin\Http\Controllers\AdminController;
 use Dcat\Admin\Admin;
 use App\Models\Customer;
-use Dcat\Admin\IFrameGrid;
 
 class ContractController extends AdminController
 {
@@ -156,13 +156,11 @@ class ContractController extends AdminController
 
             $form->column(6, function (Form $form) {
                 $form->text('title')->required();
-                $form->selectResource('customer_id')
-                    ->path('customers') // 设置表格页面链接;
-                    ->multiple(1)
-                    ->options(function ($v) { // 显示已选中的数据
-                        if (!$v) return $v;
-                        return Customer::find($v)->pluck('name', 'id');
-                    });
+                $form->selectTable('customer_id')
+                    ->title('弹窗标题')
+                    ->dialogWidth('50%') // 弹窗宽度，默认 800px
+                    ->from(CustomerTable::make(['id' => $form->getKey()])) // 设置渲染类实例，并传递自定义参数
+                    ->model(CrmCustomer::class, 'id', 'name'); // 设置编辑数据显示
                 $form->date('signdate', '签署时间')->required();
             });
 
@@ -224,28 +222,5 @@ class ContractController extends AdminController
                 return $form;
             });
         });
-    }
-
-    protected function iFrameGrid()
-    {
-        if (!Admin::user()->isRole('administrator')) {
-            $contract = Contract::whereHas('customer', function ($query) {
-                $query->where('admin_users_id', Admin::user()->id);
-            });
-        } else {
-            $contract = new Contract();
-        }
-        $grid = new IFrameGrid($contract);
-        // 如果表格数据中带有 “name”、“title”或“username”字段，则可以不用设置
-        $grid->rowSelector()->titleColumn('title');
-        $grid->id->sortable();
-        $grid->title;
-        $grid->disableRefreshButton();
-        $grid->filter(function (Grid\Filter $filter) {
-            $filter->equal('id');
-            $filter->like('title');
-        });
-
-        return $grid;
     }
 }

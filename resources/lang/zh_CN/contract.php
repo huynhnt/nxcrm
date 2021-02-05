@@ -7,7 +7,7 @@ return [
     ],
     'fields' => [
         'title' => '合同标题',
-        'crm_customer_id' => '客户',
+        'customer_id' => '客户',
         'signdate' => '签订日期',
         'expiretime' => '合同期限',
         'status' => '合同状态',
