@@ -57,12 +57,15 @@ return [
     |
     */
     'route' => [
+        'domain' => env('ADMIN_ROUTE_DOMAIN'),
 
         'prefix' => env('ADMIN_ROUTE_PREFIX', 'admin'),
 
         'namespace' => 'App\\Admin\\Controllers',
 
         'middleware' => ['web', 'admin'],
+
+        'enable_session_middleware' => false,
     ],
 
     /*
@@ -147,6 +150,7 @@ return [
             'auth/logout',
         ],
 
+        'enable_session_middleware' => false,
     ],
 
     'grid' => [
@@ -207,6 +211,7 @@ return [
         // Whether enable menu bind to a permission.
         'bind_permission' => true,
 
+        'default_icon' => 'feather icon-circle',
     ],
 
     /*
@@ -280,7 +285,10 @@ return [
         // default, blue, blue-light, green
         'color' => 'default',
 
-        'body_class' => '',
+        // sidebar-separate
+        'body_class' => [],
+
+        'horizontal_menu' => false,
 
         'sidebar_collapsed' => false,
 

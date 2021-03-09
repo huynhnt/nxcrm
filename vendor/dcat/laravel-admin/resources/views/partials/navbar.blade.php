@@ -1,4 +1,6 @@
 
+{!! admin_section(Dcat\Admin\Admin::SECTION['NAVBAR_BEFORE']) !!}
+
 <nav class="header-navbar navbar-expand-lg navbar
     navbar-with-menu {{ $configData['navbar_class'] }}
     {{ $configData['navbar_color'] }}
@@ -6,48 +8,48 @@
 
     <div class="navbar-wrapper">
         <div class="navbar-container content">
+            @if(! $configData['horizontal_menu'])
             <div class="mr-auto float-left bookmark-wrapper d-flex align-items-center">
                 <ul class="nav navbar-nav">
-                    <li class="nav-item mr-auto" style="margin: 10px 0 0 25px;">
-                        <a class="navbar-brand waves-effect waves-light"  data-widget="pushmenu" style="cursor: pointer;">
-                            <span class="logo-lg" style="font-size: 18px;"><img src="{!! admin_setting('logo') ? ('/storage/'.admin_setting('logo')):'/static/img/logo.png' !!}" width="35"> &nbsp;{!! admin_setting('crmname', 'CRM客户管理系统') !!}</span>
+                    <li class="nav-item mr-auto">
+                        <a class="nav-link menu-toggle" data-widget="pushmenu" style="cursor: pointer;">
+                            <i class="fa fa-bars font-md-2"></i>
                         </a>
                     </li>
                 </ul>
             </div>
+            @endif
 
-            <div class="navbar-collapse">
-                <div class="mr-auto float-left bookmark-wrapper d-flex align-items-center">
+            <div class="navbar-collapse d-flex justify-content-between">
+                <div class="left-navbar d-flex align-items-center">
                     {!! Dcat\Admin\Admin::navbar()->render('left') !!}
                 </div>
-                <div class="float-right d-flex align-items-center">
-                    {!! Dcat\Admin\Admin::navbar()->render() !!}
-                </div>
-                <ul class="nav navbar-nav float-right">
-                    {{--User Account Menu--}}
-                    {!! admin_section(Dcat\Admin\Admin::SECTION['NAVBAR_USER_PANEL']) !!}
 
-                    {!! admin_section(Dcat\Admin\Admin::SECTION['NAVBAR_AFTER_USER_PANEL']) !!}
-                </ul>
+                @if($configData['horizontal_menu'])
+                <div class="d-md-block horizontal-navbar-brand justify-content-center text-center">
+                    <ul class="nav navbar-nav flex-row">
+                        <li class="nav-item mr-auto">
+                            <a href="{{ admin_url('/') }}" class="waves-effect waves-light">
+                                <span class="logo-lg">{!! config('admin.logo') !!}</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                @endif
+
+                <div class=" d-flex align-items-center">
+                    {!! Dcat\Admin\Admin::navbar()->render() !!}
+
+                    <ul class="nav navbar-nav">
+                        {{--User Account Menu--}}
+                        {!! admin_section(Dcat\Admin\Admin::SECTION['NAVBAR_USER_PANEL']) !!}
+
+                        {!! admin_section(Dcat\Admin\Admin::SECTION['NAVBAR_AFTER_USER_PANEL']) !!}
+                    </ul>
+                </div>
             </div>
         </div>
     </div>
 </nav>
 
-{{-- Search Start Here --}}
-<ul class="main-search-list-defaultlist d-none">
-
-</ul>
-<ul class="main-search-list-defaultlist-other-list d-none">
-    <li class="auto-suggestion d-flex align-items-center justify-content-between cursor-pointer">
-        <a class="d-flex align-items-center justify-content-between w-100 py-50">
-            <div class="d-flex justify-content-start"><span class="mr-75 feather icon-alert-circle"></span><span>No
-results found.</span></div>
-        </a>
-    </li>
-</ul>
-<script>
-    $('.menu-toggle').on('click', function () {
-        $(this).find('i').toggleClass('icon-circle icon-disc')
-    })
-</script>
+{!! admin_section(Dcat\Admin\Admin::SECTION['NAVBAR_AFTER']) !!}

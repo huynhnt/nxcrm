@@ -22,24 +22,15 @@ use Dcat\Admin\Support\Helper;
  * Admin::js('/packages/prettydocs/js/main.js');
  *
  */
+Admin::baseCss(['static/css/nxcrm1.css'], true);
+Admin::asset()->alias('@nunito', null, '');
+Admin::asset()->alias('@montserrat', null, '');
 
 
-Dcat\Admin\Color::extend('wechat', [
-    'primary'        => '#07c160',
-    'primary-darker' => '#06ad56',
-    'link'           => '#07c160',
-]);
 
 Grid::resolving(function (Grid $grid) {
     $grid->tableCollapse(false);
 });
-
-Dcat\Admin\Color::extend('douyin', [
-    'primary'        => '#fe2d54',
-    'primary-darker' => '#ff5770',
-    'link'           => '#fe2d54',
-]);
-
 
 
 admin_inject_section('isadmin', function () {
@@ -96,11 +87,8 @@ config([
     'admin.logo' => $logo,
     'admin.logo-mini' => $logo_mini,
     'admin.layout.body_class' => admin_setting('body_class'),
-    'admin.layout.sidebar_style' => admin_setting('sidebar_style'),
-    'admin.layout.dark_mode_switch' => admin_setting('sidebar_style'),
-    'admin.layout.color' => admin_setting('color'),
+    'admin.layout.sidebar_style' => 'light',
+    'admin.layout.dark_mode_switch' => true,
+    'admin.layout.color' => 'blue',
+    'admin.layout.horizontal_menu' => admin_setting('horizontal_menu'),
 ]);
-
-Admin::baseCss(['static/css/nxcrm.css'], true);
-Admin::asset()->alias('@nunito', null, '');
-Admin::asset()->alias('@montserrat', null, '');

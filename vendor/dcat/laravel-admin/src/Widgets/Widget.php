@@ -14,7 +14,7 @@ use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Support\Arr;
 
 /**
- * @method $this class(string $class, bool $append = false)
+ * @method $this class(array|string $class, bool $append = false)
  * @method $this style(string $style, bool $append = true)
  * @method $this id(string $id = null)
  */
@@ -201,6 +201,18 @@ abstract class Widget implements Renderable
     }
 
     /**
+     * @param string $elementClass
+     *
+     * @return $this
+     */
+    public function setElementClass(string $elementClass)
+    {
+        $this->elementClass = $elementClass;
+
+        return $this;
+    }
+
+    /**
      * @return mixed
      */
     public function getElementClass()
@@ -301,6 +313,10 @@ abstract class Widget implements Renderable
         if ($method === 'style' || $method === 'class') {
             $value = $parameters[0] ?? null;
             $append = $parameters[1] ?? ($method === 'class' ? false : true);
+
+            if (is_array($value)) {
+                $value = implode(' ', $value);
+            }
 
             if ($append) {
                 $original = $this->htmlAttributes[$method] ?? '';

@@ -36,63 +36,26 @@
 @overwrite
 </script>
 
-@section('admin.select-load')
-    @if(isset($load))
-    <script once>
-        var selector = '{!! $selector !!}';
 
-        $(document).off('change', selector);
-        $(document).on('change', selector, function () {
-            var target = $(this).closest('{{ $load['group'] ?? '.fields-group' }}').find(".{{ $load['class'] }}");
+@if(isset($loads))
+{{--loads联动--}}
+<script once>
+    var selector = '{!! $selector !!}';
 
-            if (String(this.value) !== '0' && ! this.value) {
-                return;
-            }
-            target.find("option").remove();
+    var fields = '{!! $loads['fields'] !!}'.split('^');
+    var urls = '{!! $loads['urls'] !!}'.split('^');
 
-            $.ajax("{!! $load['url'].(strpos($load['url'],'?')?'&':'?') !!}q="+this.value).then(function (data) {
-                $.map(data, function (d) {
-                    target.append(new Option(d.{{ $load['textField'] }}, d.{{ $load['idField'] }}, false, false));
-                });
-                target.val(String(target.attr('data-value')).split(',')).trigger('change');
-            });
+    $(document).off('change', selector);
+    $(document).on('change', selector, function () {
+        Dcat.helpers.loadFields(this, {
+            group: '{{ $loads['group'] ?? '.fields-group' }}',
+            urls: urls,
+            fields: fields,
+            textField: "{{ $loads['textField'] }}",
+            idField: "{{ $loads['idField'] }}",
         });
-        $(selector).trigger('change');
-    </script>
-    @endif
-@overwrite
-
-@section('admin.select-lang')
-@if (config('app.locale') !== 'en')
-    {{--本地化--}}
-    <script once>
-        @php
-            $lang = trans('select2') ?: [];
-            $locale = str_replace('_', '-', config('app.locale'));
-        @endphp
-        if ($.fn.select2) {
-            var e = $.fn.select2.amd;
-
-            e.define("select2/i18n/{{ $locale }}", [], function () {
-                return {
-                    errorLoading: function () {
-                        return "{{ $lang['error_loading'] ?? '' }}"
-                    }, inputTooLong: function (e) {
-                        return "{{ $lang['input_too_long'] ?? '' }}".replace(':num', e.input.length - e.maximum)
-                    }, inputTooShort: function (e) {
-                        return "{{ $lang['input_too_short'] ?? '' }}".replace(':num', e.minimum - e.input.length)
-                    }, loadingMore: function () {
-                        return "{{ $lang['loading_more'] ?? '' }}"
-                    }, maximumSelected: function (e) {
-                        return "{{ $lang['maximum_selected'] ?? '' }}".replace(':num', e.maximum)
-                    }, noResults: function () {
-                        return "{{ $lang['no_results'] ?? '' }}"
-                    }, searching: function () {
-                        return "{{ $lang['searching'] ?? '' }}"
-                    }
-                }
-            }), {define: e.define, require: e.require}
-        }
-    </script>
+    });
+    $(selector).trigger('change');
+</script>
 @endif
-@overwrite
+

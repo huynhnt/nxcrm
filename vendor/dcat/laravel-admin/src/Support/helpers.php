@@ -5,9 +5,12 @@ use Dcat\Admin\Support\Helper;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Support\MessageBag;
+use Symfony\Component\HttpFoundation\Response;
 
 if (! function_exists('admin_setting')) {
     /**
+     * 获取或保存配置参数.
+     *
      * @param string|array $key
      * @param mixed         $default
      *
@@ -31,6 +34,8 @@ if (! function_exists('admin_setting')) {
 
 if (! function_exists('admin_setting_array')) {
     /**
+     * 获取配置参数并转化为数组格式.
+     *
      * @param string $key
      * @param mixed  $default
      *
@@ -44,6 +49,8 @@ if (! function_exists('admin_setting_array')) {
 
 if (! function_exists('admin_extension_setting')) {
     /**
+     * 获取扩展配置参数.
+     *
      * @param string       $extension
      * @param string|array $key
      * @param mixed        $default
@@ -268,28 +275,11 @@ if (! function_exists('admin_controller_name')) {
      */
     function admin_controller_name()
     {
-        static $name = [];
-
-        $router = app('router');
-
-        if (! $router->current()) {
-            return 'undefined';
-        }
-
-        $actionName = $router->current()->getActionName();
-
-        if (! isset($name[$actionName])) {
-            $controller = class_basename(explode('@', $actionName)[0]);
-
-            $name[$actionName] = str_replace('Controller', '', $controller);
-        }
-
-        return $name[$actionName];
+        return Helper::getControllerName();
     }
 }
 
 if (! function_exists('admin_path')) {
-
     /**
      * Get admin path.
      *
@@ -366,7 +356,6 @@ if (! function_exists('admin_toastr')) {
 }
 
 if (! function_exists('admin_success')) {
-
     /**
      * Flash a success message bag to session.
      *
@@ -380,7 +369,6 @@ if (! function_exists('admin_success')) {
 }
 
 if (! function_exists('admin_error')) {
-
     /**
      * Flash a error message bag to session.
      *
@@ -394,7 +382,6 @@ if (! function_exists('admin_error')) {
 }
 
 if (! function_exists('admin_warning')) {
-
     /**
      * Flash a warning message bag to session.
      *
@@ -408,7 +395,6 @@ if (! function_exists('admin_warning')) {
 }
 
 if (! function_exists('admin_info')) {
-
     /**
      * Flash a message bag to session.
      *
@@ -432,20 +418,51 @@ if (! function_exists('admin_asset')) {
      */
     function admin_asset($path)
     {
-        return Dcat\Admin\Admin::asset()->url($path);
+        return Admin::asset()->url($path);
     }
 }
 
-if (! function_exists('admin_api_route')) {
-
+if (! function_exists('admin_route')) {
     /**
-     * @param string $path
+     * 根据路由别名获取url.
+     *
+     * @param string|null $route
+     * @param array $params
+     * @param bool $absolute
      *
      * @return string
      */
-    function admin_api_route(?string $path = '')
+    function admin_route(?string $route, array $params = [], $absolute = true)
     {
-        return Dcat\Admin\Admin::app()->getCurrentApiRoutePrefix().$path;
+        return Admin::app()->getRoute($route, $params, $absolute);
+    }
+}
+
+if (! function_exists('admin_route_name')) {
+    /**
+     * 获取路由别名.
+     *
+     * @param string|null $route
+     *
+     * @return string
+     */
+    function admin_route_name(?string $route)
+    {
+        return Admin::app()->getRoutePrefix().$route;
+    }
+}
+
+if (! function_exists('admin_api_route_name')) {
+    /**
+     * 获取api的路由别名.
+     *
+     * @param string $route
+     *
+     * @return string
+     */
+    function admin_api_route_name(?string $route = '')
+    {
+        return Admin::app()->getCurrentApiRoutePrefix().$route;
     }
 }
 
@@ -557,6 +574,20 @@ if (! function_exists('admin_require_assets')) {
     }
 }
 
+if (! function_exists('admin_javascript')) {
+    /**
+     * 暂存JS代码，并使用唯一字符串代替.
+     *
+     * @param string $scripts
+     *
+     * @return string
+     */
+    function admin_javascript(string $scripts)
+    {
+        return Dcat\Admin\Support\JavaScript::make($scripts);
+    }
+}
+
 if (! function_exists('admin_javascript_json')) {
     /**
      * @param array|object $data
@@ -566,5 +597,19 @@ if (! function_exists('admin_javascript_json')) {
     function admin_javascript_json($data)
     {
         return Dcat\Admin\Support\JavaScript::format($data);
+    }
+}
+
+if (! function_exists('admin_exit')) {
+    /**
+     * 响应数据并中断后续逻辑.
+     *
+     * @param Response|string|array $response
+     *
+     * @throws \Illuminate\Http\Exceptions\HttpResponseException
+     */
+    function admin_exit($response = '')
+    {
+        Admin::exit($response);
     }
 }
