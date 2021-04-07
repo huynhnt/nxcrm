@@ -1,11 +1,11 @@
 <p align="center"><img src="https://wyz.xyz/assets/files/2020-08-13/1597295447-873997-nxcrm.png" width="400"></p>
 <h1 align="center"> NXCRM客户管理系统</h1> 
 <p align="center">
-<a href="http://nx.tt"><img src="https://img.shields.io/badge/version-1.12.29-green" alt="Build Status"></a>
-<a href="http://nx.tt"><img src="https://img.shields.io/badge/laravel-8.0-%23ef3b2d" alt="Total Downloads"></a>
+<a href="https://www.nxcrm.vip"><img src="https://img.shields.io/badge/version-1.12.29-green" alt="Build Status"></a>
+<a href="https://www.nxcrm.vip"><img src="https://img.shields.io/badge/laravel-8.0-%23ef3b2d" alt="Total Downloads"></a>
 <a href="http://www.dcatadmin.com/"><img src="https://img.shields.io/badge/dcatadmin-2.0.14-%234c5ec2" alt="Latest Stable Version"></a>
-<a href="http://nx.tt"><img src="https://img.shields.io/badge/MYSQL-8.0-%2300758f" alt="License"></a>
-<a href="http://nx.tt">
+<a href="https://www.nxcrm.vip"><img src="https://img.shields.io/badge/MYSQL-8.0-%2300758f" alt="License"></a>
+<a href="https://www.nxcrm.vip">
         <img src="https://img.shields.io/badge/Licence-GPL3.0-green.svg?style=flat" />
     </a>
 </p>
@@ -17,14 +17,14 @@
 
 NXCRM 是宁夏南相开发的客户管理系统，包含了线索，商机，合同，收款，客户，附件，联系人，跟进动态等功能。囊括可客户管理所需的大多数功能。后期版本我们将增加小程序功能。敬请期待。 
 
-系统采用LARAVEL8+Mysql核心技术，系统功能介绍[[查看]](https://nx.tt)，企业微信交流群，专业售后服务团队，让您使用无忧。有着详细文档地址：https://doc.nx.tt
+系统采用LARAVEL8+Mysql核心技术，系统功能介绍[[查看]](https://www.nxcrm.vip)，企业微信交流群，专业售后服务团队，让您使用无忧。有着详细文档地址：https://doc.nxcrm.vip
 
 ## 联系
 ![](https://wyz.xyz/assets/files/2020-12-29/1609212045-909182-1.jpeg)
 
 
 ## 演示：
-https://nx.tt
+https://www.nxcrm.vip
 
 ## 环境要求
 
@@ -66,13 +66,6 @@ https://nx.tt
 
 8：此时可以通过访问 `http://your_domain` 来使用 NXCRM。管理员账号密码为：`admin / admin`。
 
-### 傻瓜化安装
-执行
-```
-http://your_domain/install/
-```
-按照引导填写安装信息。
-安装完毕后，通过访问 `http://your_domain` 来使用 NXCRM。管理员账号密码为：`admin / admin`。
 
 ## 白色主题
  ---
@@ -144,9 +137,3 @@ http://your_domain/install/
 + [bootstrap-validator](https://github.com/1000hz/bootstrap-validator)
 + [Google map](https://www.google.com/maps)
 + [Tencent map](http://lbs.qq.com/)
-
-
-## 最后
- ---
- 登录页面的两张图是我老家，我奶奶住过的院子和窑洞。很想念她。作为一个五大三粗的码农不知道如何表达。谨以我的第一个编程作品纪念。
- 封面图可自行替换。
