@@ -17,14 +17,14 @@
 
 NXCRM 是宁夏南相开发的客户管理系统，包含了线索，商机，合同，收款，客户，附件，联系人，跟进动态等功能。囊括可客户管理所需的大多数功能。后期版本我们将增加小程序功能。敬请期待。 
 
-系统采用LARAVEL8+Mysql核心技术，系统功能介绍[[查看]](https://www.nxcrm.vip)，企业微信交流群，专业售后服务团队，让您使用无忧。有着详细文档地址：https://doc.nxcrm.vip
+系统采用LARAVEL8+Mysql核心技术，系统功能介绍[[查看]](https://www.nxos.vip)，企业微信交流群，专业售后服务团队，让您使用无忧。有着详细文档地址：https://doc.nxos.vip
 
 ## 联系
 ![](https://wyz.xyz/assets/files/2020-12-29/1609212045-909182-1.jpeg)
 
 
 ## 演示：
-https://www.nxcrm.vip
+https://www.nxos.vip
 
 ## 环境要求
 
